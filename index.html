@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Easy PDF Converter - Free Online PDF Tools</title>
+<meta name="description" content="Easy PDF Converter provides simple free online tools to convert, merge, split and work with PDF files directly in your browser.">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://YOUR-DOMAIN.example/">
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f6f8fb;color:#182230}
+header{background:#fff;border-bottom:1px solid #e5e9ef;position:sticky;top:0;z-index:10}
+.nav{max-width:1100px;margin:auto;padding:16px 20px;display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:23px;font-weight:800;color:#155eef}.logo span{color:#182230}
+.nav a{color:#445;text-decoration:none;margin-left:18px;font-size:14px}
+.hero{max-width:1000px;margin:55px auto 35px;text-align:center;padding:0 20px}
+.hero h1{font-size:44px;margin:0 0 14px}.hero p{font-size:18px;color:#667085;line-height:1.6}
+.grid{max-width:1100px;margin:30px auto 70px;padding:0 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
+.card{background:#fff;border:1px solid #e5e9ef;border-radius:16px;padding:24px;box-shadow:0 5px 18px rgba(16,24,40,.05)}
+.card h2{font-size:19px;margin:10px 0}.card p{color:#667085;min-height:44px;font-size:14px;line-height:1.5}
+button{background:#155eef;color:white;border:0;border-radius:9px;padding:12px 17px;font-weight:700;cursor:pointer}
+button:hover{opacity:.9}.file{width:100%;margin:10px 0 15px}.status{margin-top:12px;font-size:13px;color:#475467}
+.info{max-width:900px;margin:0 auto 60px;padding:0 20px}.info h2{font-size:28px}.info p{line-height:1.7;color:#596579}
+footer{background:#101828;color:#fff;text-align:center;padding:28px 20px;font-size:13px}
+@media(max-width:600px){.hero h1{font-size:32px}.nav a{display:none}}
+</style>
+</head>
+<body>
+<header><div class="nav">
+<div class="logo">Easy<span>PDF Converter</span></div>
+<nav><a href="#tools">Tools</a><a href="#about">About</a></nav>
+</div></header>
+
+<section class="hero">
+<h1>Easy PDF Converter</h1>
+<p>Simple, fast PDF tools that work directly in your browser. Your selected files are processed on your device for the tools available on this page.</p>
+</section>
+
+<section id="tools" class="grid">
+<div class="card">
+<div>📄 → 🖼️</div><h2>PDF to JPG</h2>
+<p>Convert the first page of a PDF into a JPG image.</p>
+<input class="file" id="pdfJpg" type="file" accept="application/pdf">
+<button onclick="pdfToJpg()">Convert</button><div id="pdfJpgStatus" class="status"></div>
+</div>
+
+<div class="card">
+<div>🖼️ → 📄</div><h2>JPG to PDF</h2>
+<p>Turn an image into a downloadable PDF file.</p>
+<input class="file" id="jpgPdf" type="file" accept="image/jpeg,image/png">
+<button onclick="jpgToPdf()">Convert</button><div id="jpgPdfStatus" class="status"></div>
+</div>
+
+<div class="card">
+<div>📑 + 📑</div><h2>Merge PDF</h2>
+<p>Combine two or more PDF files into one PDF.</p>
+<input class="file" id="mergePdf" type="file" accept="application/pdf" multiple>
+<button onclick="mergePdfs()">Merge</button><div id="mergeStatus" class="status"></div>
+</div>
+
+<div class="card">
+<div>✂️</div><h2>Split PDF</h2>
+<p>Download the first page of a PDF as a separate PDF.</p>
+<input class="file" id="splitPdf" type="file" accept="application/pdf">
+<button onclick="splitPdf()">Split</button><div id="splitStatus" class="status"></div>
+</div>
+</section>
+
+<section id="about" class="info">
+<h2>Free Online PDF Tools</h2>
+<p>Easy PDF Converter is designed as a lightweight online PDF utility website. We can expand this website with PDF compression, page extraction, Word conversion, Excel conversion, watermarking and other tools.</p>
+<p><strong>SEO plan:</strong> each tool should eventually have its own dedicated page, optimized title, description, useful explanatory content, FAQ section, internal links and a sitemap. Do not expect instant Google rankings; indexing and ranking normally take time.</p>
+</section>
+
+<footer>© 2026 Easy PDF Converter. All rights reserved.</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs" type="module"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<script>
+const CDN_PDFJS='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs';
+async function loadPdfJs(){
+  if(window.__pdfjs) return window.__pdfjs;
+  const m=await import(CDN_PDFJS);
+  m.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs';
+  window.__pdfjs=m; return m;
+}
+function downloadBlob(blob,name){
+ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click();
+ setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+async function pdfToJpg(){
+ const f=document.getElementById('pdfJpg').files[0], s=document.getElementById('pdfJpgStatus');
+ if(!f){s.textContent='Please choose a PDF.';return}
+ try{
+  s.textContent='Converting...'; const pdfjs=await loadPdfJs();
+  const data=await f.arrayBuffer(); const pdf=await pdfjs.getDocument({data}).promise;
+  const page=await pdf.getPage(1); const vp=page.getViewport({scale:1.6});
+  const c=document.createElement('canvas'); c.width=vp.width;c.height=vp.height;
+  await page.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;
+  c.toBlob(b=>{downloadBlob(b,f.name.replace(/\.pdf$/i,'')+'-page-1.jpg');s.textContent='Done.'},'image/jpeg',.9);
+ }catch(e){s.textContent='Could not convert this PDF.'}
+}
+async function jpgToPdf(){
+ const f=document.getElementById('jpgPdf').files[0],s=document.getElementById('jpgPdfStatus');
+ if(!f){s.textContent='Please choose an image.';return}
+ try{
+  s.textContent='Creating PDF...'; const img=await new Promise(r=>{let i=new Image();i.onload=()=>r(i);i.src=URL.createObjectURL(f)});
+  const {jsPDF}=window.jspdf; const pdf=new jsPDF({orientation:img.width>img.height?'landscape':'portrait',unit:'px',format:[img.width,img.height]});
+  pdf.addImage(img,'JPEG',0,0,img.width,img.height); pdf.save(f.name.replace(/\.[^.]+$/,'')+'.pdf'); s.textContent='Done.';
+ }catch(e){s.textContent='Could not create the PDF.'}
+}
+async function mergePdfs(){
+ const files=[...document.getElementById('mergePdf').files],s=document.getElementById('mergeStatus');
+ if(files.length<2){s.textContent='Please choose at least 2 PDF files.';return}
+ try{
+  s.textContent='Merging...'; const out=await PDFLib.PDFDocument.create();
+  for(const f of files){const src=await PDFLib.PDFDocument.load(await f.arrayBuffer());const pages=await out.copyPages(src,src.getPageIndices());pages.forEach(p=>out.addPage(p))}
+  const bytes=await out.save();downloadBlob(new Blob([bytes],{type:'application/pdf'}),'merged.pdf');s.textContent='Done.';
+ }catch(e){s.textContent='Could not merge these PDFs.'}
+}
+async function splitPdf(){
+ const f=document.getElementById('splitPdf').files[0],s=document.getElementById('splitStatus');
+ if(!f){s.textContent='Please choose a PDF.';return}
+ try{
+  s.textContent='Splitting...'; const src=await PDFLib.PDFDocument.load(await f.arrayBuffer()),out=await PDFLib.PDFDocument.create();
+  const [p]=await out.copyPages(src,[0]);out.addPage(p);const bytes=await out.save();
+  downloadBlob(new Blob([bytes],{type:'application/pdf'}),'split-page-1.pdf');s.textContent='Done.';
+ }catch(e){s.textContent='Could not split this PDF.'}
+}
+</script>
+</body>
+</html>
